@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Login() {
   const [userType, setUserType] = useState('user'); // 'user' or 'agent'
@@ -7,7 +8,12 @@ export default function Login() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
       <div className="text-center mb-6">
         <p className="text-blue-500">사기 걱정없이 부동산 매물 찾는 법</p>
-        <h1 className="text-4xl font-bold">Get Our Home</h1>
+        <h1 className="text-4xl font-bold">겟 아워 홈</h1>
+      </div>
+      <div className="text-left w-full max-w-sm mb-2">
+        <Link href="/home" legacyBehavior>
+          <a className="text-sm text-blue-500 hover:text-blue-700">홈으로</a>
+        </Link>
       </div>
       <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
         <div className="flex border-b mb-4">
@@ -75,11 +81,17 @@ export default function Login() {
           </div>
         </form>
         <div className="text-center mt-4">
-          <a href="#" className="text-sm text-gray-500 hover:text-gray-700 mr-2">아이디 찾기</a>
+          <Link href="/find-id" legacyBehavior>
+            <a className="text-sm text-gray-500 hover:text-gray-700 mr-2">아이디 찾기</a>
+          </Link>
           <span className="text-gray-500">|</span>
-          <a href="#" className="text-sm text-gray-500 hover:text-gray-700 mx-2">비밀번호 재설정</a>
+          <Link href="/reset-password" legacyBehavior>
+            <a className="text-sm text-gray-500 hover:text-gray-700 mx-2">비밀번호 재설정</a>
+          </Link>
           <span className="text-gray-500">|</span>
-          <a href="#" className="text-sm text-gray-500 hover:text-gray-700 ml-2">회원가입</a>
+          <Link href="/signup" legacyBehavior>
+            <a className="text-sm text-gray-500 hover:text-gray-700 ml-2">회원가입</a>
+          </Link>
         </div>
       </div>
       <div className="mt-8 w-full max-w-sm">

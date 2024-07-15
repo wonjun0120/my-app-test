@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export default function Signup() {
   const [userType, setUserType] = useState('user'); // 'user' or 'agent'
@@ -12,6 +15,8 @@ export default function Signup() {
     registrationNumber: '',
   });
   const [passwordMatch, setPasswordMatch] = useState(true);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,15 +26,63 @@ export default function Signup() {
     });
   };
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const isPasswordMatch = form.password === form.confirmPassword;
+    const phoneRegex = /^010-\d{4}-\d{4}$/;
+    const isPhoneValid = phoneRegex.test(form.phone);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailRegex.test(form.email);
+
+    setIsFormValid(
+      form.username &&
+      form.password &&
+      form.confirmPassword &&
+      form.name &&
+      form.email &&
+      form.phone &&
+      isPasswordMatch &&
+      isPhoneValid &&
+      isEmailValid &&
+      (userType === 'user' || (userType === 'agent' && form.registrationNumber))
+    );
+
+    setPasswordMatch(isPasswordMatch);
+  }, [form, userType]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      setPasswordMatch(false);
-      return;
+    if (!isFormValid) return;
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/users/register', {
+        username: form.name,
+        password: form.password,
+        email: form.email,
+        phone_number: form.phone,
+        user_id: form.username,
+        ...(userType === 'agent' && { registrationNumber: form.registrationNumber }),
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 201) {
+        console.log('회원가입 성공:', response.data);
+        alert('회원가입이 성공적으로 완료되었습니다.');
+        router.push('/login');
+      } else {
+        console.error('회원가입 실패: 예상하지 못한 상태 코드', response.status);
+        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert(`회원가입 실패: ${error.response.data.error}`);
+      } else {
+        console.error('회원가입 실패:', error.response ? error.response.data : error.message);
+        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
     }
-    setPasswordMatch(true);
-    // 회원가입 처리 로직 추가
-    console.log('회원가입 정보:', form, '유형:', userType);
   };
 
   return (
@@ -51,7 +104,6 @@ export default function Signup() {
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
           {userType === 'agent' && (
             <div className="mb-4">
               <label htmlFor="registrationNumber" className="block text-gray-700 text-sm font-bold mb-2">
@@ -68,6 +120,7 @@ export default function Signup() {
               />
             </div>
           )}
+          <div className="mb-4">
             <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
               아이디
             </label>
@@ -128,7 +181,7 @@ export default function Signup() {
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-              이메일
+              이메일 (예: user@example.com)
             </label>
             <input
               type="email"
@@ -142,7 +195,7 @@ export default function Signup() {
           </div>
           <div className="mb-4">
             <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
-              전화번호
+              전화번호 (예: 010-0000-0000)
             </label>
             <input
               type="tel"
@@ -150,15 +203,27 @@ export default function Signup() {
               name="phone"
               value={form.phone}
               onChange={handleChange}
+              pattern="010-\d{4}-\d{4}"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
           
           <div className="flex items-center justify-between">
+            <Link href="/login">
+              <button
+                type="button"
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                로그인 화면으로
+              </button>
+            </Link>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className={`font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                isFormValid ? 'bg-blue-500 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'
+              }`}
+              disabled={!isFormValid}
             >
               회원가입
             </button>

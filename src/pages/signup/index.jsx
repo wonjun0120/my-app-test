@@ -53,19 +53,28 @@ export default function Signup() {
     e.preventDefault();
     if (!isFormValid) return;
 
+    const url =
+      userType === 'user'
+        ? 'http://localhost:8080/api/users/register'
+        : 'http://localhost:8080/api/agents/register';
+
     try {
-      const response = await axios.post('http://localhost:8080/api/users/register', {
-        username: form.name,
-        password: form.password,
-        email: form.email,
-        phone_number: form.phone,
-        user_id: form.username,
-        ...(userType === 'agent' && { registrationNumber: form.registrationNumber }),
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        url,
+        {
+          username: form.name,
+          password: form.password,
+          email: form.email,
+          phone_number: form.phone,
+          user_id: form.username,
+          ...(userType === 'agent' && { registrationNumber: form.registrationNumber }),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
         }
-      });
+      );
 
       if (response.status === 201) {
         console.log('회원가입 성공:', response.data);

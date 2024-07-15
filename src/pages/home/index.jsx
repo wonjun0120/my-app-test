@@ -3,10 +3,18 @@ import Link from 'next/link';
 import FooterNavigation from '../../components/FooterNavigation';
 import AISuggestedProperties from '../../components/AISuggestedProperties';
 import HotProperties from '../../components/HotProperties';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // JWT 토큰 확인하여 로그인 상태 설정
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white pb-24">

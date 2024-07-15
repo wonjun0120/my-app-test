@@ -1,8 +1,58 @@
 import { useState } from 'react';
+import axios from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function Login() {
   const [userType, setUserType] = useState('user'); // 'user' or 'agent'
+  const [form, setForm] = useState({
+    id: '',
+    password: ''
+  });
+  const router = useRouter();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const apiUrl = userType === 'user'
+      ? 'http://localhost:8080/api/users/login'
+      : 'http://localhost:8080/api/agents/login';
+
+    try {
+      const response = await axios.post(apiUrl, {
+        user_id: form.id,
+        password: form.password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
+        const { jwt } = response.data;
+        console.log('로그인 성공:', response.data);
+        localStorage.setItem('token', jwt);
+        router.push('/home');
+      } else {
+        console.error('로그인 실패: 예상하지 못한 상태 코드', response.status);
+        alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert(`로그인 실패: ${error.response.data.error}`);
+      } else {
+        console.error('로그인 실패:', error.response ? error.response.data : error.message);
+        alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
@@ -30,7 +80,7 @@ export default function Login() {
             공인중개사
           </button>
         </div>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4 relative">
             <label htmlFor="id" className="block text-gray-700 text-sm font-bold mb-2">
               <svg className="inline-block w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -45,6 +95,9 @@ export default function Login() {
             <input
               type="text"
               id="id"
+              name="id"
+              value={form.id}
+              onChange={handleChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="아이디"
             />
@@ -63,6 +116,9 @@ export default function Login() {
             <input
               type="password"
               id="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="비밀번호"
             />
@@ -94,11 +150,13 @@ export default function Login() {
           </Link>
         </div>
       </div>
-      <div className="mt-8 w-full max-w-sm">
-        <button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded w-full">
-          카카오톡으로 간편 가입
-        </button>
-      </div>
+      {userType === 'user' && (
+        <div className="mt-8 w-full max-w-sm">
+          <button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded w-full">
+            카카오톡으로 간편 가입
+          </button>
+        </div>
+      )}
     </div>
   );
 }

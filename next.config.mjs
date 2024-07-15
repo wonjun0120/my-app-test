@@ -10,9 +10,11 @@ const nextConfig = {
       },
     ];
   },
+  env: {
+    NEXT_PUBLIC_NAVER_MAP_CLIENT_ID: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID,
+  },
 };
 
 export default withPWA({
   dest: 'public',
 })(nextConfig);
-

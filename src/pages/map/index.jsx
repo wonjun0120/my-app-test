@@ -8,6 +8,7 @@ const MapPage = () => {
   const [selectedType, setSelectedType] = useState('전체');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isListModalOpen, setIsListModalOpen] = useState(false); // 매물 리스트 모달 상태
   const router = useRouter();
 
   const propertyTypes = [
@@ -35,9 +36,35 @@ const MapPage = () => {
     setIsFilterModalOpen(false);
   };
 
+  const openListModal = () => {
+    setIsListModalOpen(true);
+  };
+
+  const closeListModal = () => {
+    setIsListModalOpen(false);
+  };
+
   const handleTypeSelect = (type) => {
     setSelectedType(type);
     closeModal();
+  };
+
+  const goToMyLocation = () => {
+    if (window.navigator.geolocation) {
+      window.navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        const map = new window.naver.maps.Map('map', {
+          center: new window.naver.maps.LatLng(latitude, longitude),
+          zoom: 15,
+        });
+        new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(latitude, longitude),
+          map: map,
+        });
+      });
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
   };
 
   return (
@@ -61,8 +88,22 @@ const MapPage = () => {
           필터
         </button>
       </header>
-      <div className="flex-grow">
+      <div className="relative flex-grow">
         <NaverMap />
+        <div className="absolute bottom-20 w-full flex justify-between items-center px-4">
+          <button
+              onClick={openListModal}
+              className="p-3 bg-blue-500 text-white rounded-full shadow-lg z-10"
+            >
+              목록
+          </button>
+          <button
+            onClick={goToMyLocation}
+            className="p-3 bg-blue-500 text-white rounded-full shadow-lg z-10"
+          >
+            내 위치
+          </button>
+        </div>
       </div>
       <FooterNavigation activeTab="map" />
 
@@ -133,6 +174,24 @@ const MapPage = () => {
             <button onClick={closeFilterModal} className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg">
               적용하기
             </button>
+          </div>
+        </div>
+      )}
+
+      {isListModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md h-screen overflow-y-auto relative">
+            <button onClick={closeListModal} className="absolute top-2 left-2 text-gray-500 hover:text-gray-700">
+              X
+            </button>
+            <h2 className="text-xl font-bold mb-4">매물 리스트</h2>
+            {/* 여기에 매물 리스트를 추가하세요 */}
+            <div className="mb-4">
+              <p>매물 1</p>
+              <p>매물 2</p>
+              <p>매물 3</p>
+              {/* 더 많은 매물 항목들 */}
+            </div>
           </div>
         </div>
       )}

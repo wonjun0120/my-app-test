@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     // JWT 토큰 확인하여 로그인 상태 설정
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('get-our-home-token');
     if (token) {
       setIsLoggedIn(true);
     }

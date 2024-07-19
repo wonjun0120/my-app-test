@@ -25,3 +25,26 @@
     z-index: 1001; /* 모달이 다른 요소 위에 표시되도록 설정 */
   }
   
+  /* styles.css */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  #__next {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  #map {
+    flex-grow: 1;
+  }
+  
+  .relative.flex-grow {
+    position: relative;
+    flex-grow: 1;
+    height: calc(100vh - 112px); /* Adjust according to your header and footer height */
+  }
+  

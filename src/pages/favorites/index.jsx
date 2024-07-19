@@ -11,7 +11,7 @@ export default function Favorites() {
     // 예를 들어, 토큰이 있는지 확인하거나, 사용자 정보를 API로 확인할 수 있습니다.
     const checkLoginStatus = () => {
       // 예시로 로컬 스토리지에서 토큰을 확인하는 로직
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('get-our-home-token');
       if (token) {
         setIsLoggedIn(true);
       } else {

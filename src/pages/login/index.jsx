@@ -38,7 +38,7 @@ export default function Login() {
       if (response.status === 200) {
         const { jwt } = response.data;
         console.log('로그인 성공:', response.data);
-        localStorage.setItem('token', jwt);
+        localStorage.setItem('get-our-home-token', jwt);
         router.push('/home');
       } else {
         console.error('로그인 실패: 예상하지 못한 상태 코드', response.status);
